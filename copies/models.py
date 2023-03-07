@@ -9,7 +9,11 @@ class Copy(models.Model):
         "books.Book", related_name="copies", on_delete=models.CASCADE
     )
 
-    account = models.ManyToManyField("accounts.Account", through="copies.Loan", related_name="copies")
+    account = models.ManyToManyField(
+        "accounts.Account", through="copies.Loan", related_name="copies"
+    )
+
+    last_loan = models.DateTimeField(null=True, default=None)
 
 
 class Loan(models.Model):
@@ -19,4 +23,4 @@ class Loan(models.Model):
     deliver_in = models.DateTimeField()
     delivery_at = models.DateTimeField(null=True)
     copy = models.ForeignKey("copies.Copy", on_delete=models.CASCADE)
-    user = models.ForeignKey("accounts.Account", on_delete=models.CASCADE)
+    account = models.ForeignKey("accounts.Account", on_delete=models.CASCADE)

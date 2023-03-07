@@ -17,4 +17,4 @@ class Book(models.Model):
 class Follow(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     book = models.ForeignKey("books.Book", on_delete=models.CASCADE)
-    user = models.ForeignKey("accounts.Account", on_delete=models.CASCADE)
+    account = models.ForeignKey("accounts.Account", on_delete=models.CASCADE)
