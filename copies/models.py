@@ -13,6 +13,8 @@ class Copy(models.Model):
         "accounts.Account", through="copies.Loan", related_name="copies"
     )
 
+    last_loan = models.DateTimeField(null=True, default=None)
+
 
 class Loan(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
