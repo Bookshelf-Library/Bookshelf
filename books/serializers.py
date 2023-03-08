@@ -10,6 +10,7 @@ class BookSerializer(serializers.ModelSerializer):
         model = Book
         fields = ["id", "title", "pages", "author", "publisher", "account", "copies"]
         read_only_fields = ["id", "account", "copies"]
+        depth = 1
 
     def get_copies(self, obj):
         return Copy.objects.filter(book=obj).count()
@@ -20,3 +21,4 @@ class FollowSerializer(serializers.ModelSerializer):
         model = Follow
         fields = ["id", "book", "account"]
         read_only_fields = ["id", "book", "account"]
+        depth = 1
