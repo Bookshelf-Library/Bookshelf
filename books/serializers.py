@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Book, Follow
 from copies.models import Copy
+from rest_framework.response import Response
 
 
 class BookSerializer(serializers.ModelSerializer):
@@ -19,6 +20,6 @@ class BookSerializer(serializers.ModelSerializer):
 class FollowSerializer(serializers.ModelSerializer):
     class Meta:
         model = Follow
-        fields = ["id", "book", "account"]
-        read_only_fields = ["id", "book", "account"]
+        fields = ["id", "book",]
+        read_only_fields = ["id", "book",]
         depth = 1
