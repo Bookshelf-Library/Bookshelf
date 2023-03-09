@@ -12,7 +12,7 @@ from .serializers import CopySerializer
 class CopiesDetailView(generics.CreateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [BookPermission]
-    
+
     def create(self, request, *args, **kwargs):
         book_id = kwargs["book_id"]
         copies_qtd = kwargs["copies_qtd"]

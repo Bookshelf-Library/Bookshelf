@@ -35,3 +35,10 @@ class FollowBook(generics.CreateAPIView):
         primary_key = self.kwargs["book_id"]
         book = get_object_or_404(Book, pk=primary_key)
         serializer.save(account=self.request.user, book=book)
+
+class FollowDetailView(generics.RetrieveUpdateDestroyAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = FollowSerializer
+    queryset = Follow.objects.all()
+    lookup_url_kwarg = 'book_id'

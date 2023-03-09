@@ -14,7 +14,6 @@ class CreateUserOrIsColaborator(BasePermission):
 
 class IsOwnerOrColaborator(BasePermission):
     def has_permission(self, request: Request, view):
-
         return (
             request.user
             and str(request.user.id) == view.kwargs["account_id"]
