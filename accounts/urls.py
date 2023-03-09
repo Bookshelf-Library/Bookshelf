@@ -1,5 +1,10 @@
 from django.urls import path
-from .views import AccountView, AccountDetailView, AccountStatusDetailView, AccountLoansDetailView
+from .views import (
+    AccountView,
+    AccountDetailView,
+    AccountStatusDetailView,
+    AccountLoansDetailView,
+)
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 

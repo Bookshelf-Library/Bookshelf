@@ -20,6 +20,12 @@ class BookSerializer(serializers.ModelSerializer):
 class FollowSerializer(serializers.ModelSerializer):
     class Meta:
         model = Follow
-        fields = ["id", "book",]
-        read_only_fields = ["id", "book",]
+        fields = [
+            "id",
+            "book",
+        ]
+        read_only_fields = [
+            "id",
+            "book",
+        ]
         depth = 1

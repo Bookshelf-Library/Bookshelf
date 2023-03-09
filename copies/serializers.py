@@ -13,5 +13,21 @@ class CopySerializer(serializers.ModelSerializer):
 class LoanSerializer(serializers.ModelSerializer):
     class Meta:
         model = Loan
-        fields = ["id", "is_active", "loaned_at", "deliver_in", "deliver_at", "copy", "account"]
-        read_only_fields = ["id", "copy", "loaned_at", "deliver_in", "deliver_at", "account", "is_active"]
+        fields = [
+            "id",
+            "is_active",
+            "loaned_at",
+            "deliver_in",
+            "deliver_at",
+            "copy",
+            "account",
+        ]
+        read_only_fields = [
+            "id",
+            "copy",
+            "loaned_at",
+            "deliver_in",
+            "deliver_at",
+            "account",
+            "is_active",
+        ]
