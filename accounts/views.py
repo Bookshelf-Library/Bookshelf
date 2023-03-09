@@ -1,6 +1,6 @@
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import Response
+from rest_framework.views import APIView, Response
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveAPIView
 from django.shortcuts import get_object_or_404
 from .serializers import AccountSerializer
@@ -26,7 +26,7 @@ class AccountDetailView(RetrieveUpdateDestroyAPIView):
     lookup_url_kwarg = "account_id"
 
 
-class AccountStatusDetailView(RetrieveAPIView):
+class AccountStatusDetailView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, IsOwnerOrColaborator]
 
