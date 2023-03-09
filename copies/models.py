@@ -9,7 +9,7 @@ class Copy(models.Model):
         "books.Book", related_name="copies", on_delete=models.CASCADE
     )
 
-    account = models.ManyToManyField(
+    loans = models.ManyToManyField(
         "accounts.Account", through="copies.Loan", related_name="loans"
     )
 

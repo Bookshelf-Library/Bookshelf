@@ -1,6 +1,6 @@
-from django.contrib import admin
 from django.urls import path
+from .views import CopiesDetailView
 
-# urlpatterns = [
-#     path("admin/", admin.site.urls),
-# ]
+urlpatterns = [
+    path("books/<str:book_id>/copies/<int:copies_qtd>/", CopiesDetailView.as_view()),
+]
