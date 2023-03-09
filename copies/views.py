@@ -19,19 +19,9 @@ class CopiesDetailView(generics.CreateAPIView):
 
         find_book = get_object_or_404(Book, pk=book_id)
 
-        data = Copy(book=find_book)
+        data = [Copy(book=find_book) for _ in range(copies_qtd)]
+        Copy.objects.bulk_create(data)
 
-        # data = [Copy(book=find_book) for _ in range(copies_qtd)]
-
-        serializer = CopySerializer(data)
-
-        Book.objects.bulk_create(data)
+        serializer = CopySerializer(data, many=True)
 
         return Response(serializer.data, 201)
-        # data = []
-
-        # for key, value in find_book.items():
-        #     copy = Copy()
-        #     setattr(Copy, key, value)
-        #     data.append(copy)
-
