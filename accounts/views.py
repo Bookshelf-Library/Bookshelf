@@ -36,3 +36,15 @@ class AccountStatusDetailView(APIView):
         serializer = AccountSerializer(find_account)
 
         return Response(serializer.data, 200)
+
+
+class AccountLoansDetailView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, IsOwnerOrColaborator]
+
+    def get(self, request, account_id):
+        find_account = get_object_or_404(Account, pk=account_id)
+
+        serializer = AccountSerializer(find_account)
+
+        return Response(serializer.data["loans"], 200)
