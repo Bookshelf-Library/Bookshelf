@@ -5,8 +5,8 @@ from .models import Copy, Loan
 class CopySerializer(serializers.ModelSerializer):
     class Meta:
         model = Copy
-        fields = ["id", "is_avaliable", "book", "account", "last_loan"]
-        read_only_fields = ["id", "book", "is_avaliable", "account", "last_loan"]
+        fields = ["id", "is_avaliable", "book", "loans", "last_loan"]
+        read_only_fields = ["id", "book", "is_avaliable", "loans", "last_loan"]
         extra_kwargs = {"last_loan": {"allow_null": True}}
 
 

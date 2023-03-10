@@ -9,9 +9,8 @@ class BookSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Book
-        fields = ["id", "title", "pages", "author", "publisher", "account", "copies"]
-        read_only_fields = ["id", "account", "copies"]
-        depth = 1
+        fields = ["id", "title", "pages", "author", "publisher", "followers", "copies"]
+        read_only_fields = ["id", "followers", "copies"]
 
     def get_copies(self, obj):
         return Copy.objects.filter(book=obj).count()
@@ -28,4 +27,3 @@ class FollowSerializer(serializers.ModelSerializer):
             "id",
             "book",
         ]
-        depth = 1
