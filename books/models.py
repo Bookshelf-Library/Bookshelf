@@ -10,7 +10,9 @@ class Book(models.Model):
     publisher = models.CharField(max_length=120)
 
     followers = models.ManyToManyField(
-        "accounts.account", through="books.Follow", related_name="following"
+        "accounts.account",
+        through="books.Follow",
+        related_name="following",
     )
 
 
