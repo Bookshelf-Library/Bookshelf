@@ -24,21 +24,27 @@ class FollowBook(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        find_account = Book.objects.filter(account=request.user)
+
+        find_account = Book.objects.filter(id=kwargs["book_id"], followers=request.user)
         if find_account:
-            return Response({"message": "user is already following this book"}, status=400)
+            return Response(
+                {"message": "user is already following this book"}, status=400
+            )
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
     def perform_create(self, serializer):
         primary_key = self.kwargs["book_id"]
         book = get_object_or_404(Book, pk=primary_key)
         serializer.save(account=self.request.user, book=book)
 
+
 class FollowDetailView(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = FollowSerializer
     queryset = Follow.objects.all()
-    lookup_url_kwarg = 'book_id'
+    lookup_url_kwarg = "book_id"
