@@ -18,7 +18,7 @@ class Copy(models.Model):
 
 class Loan(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    is_active = models.BooleanField()
+    is_active = models.BooleanField(default=True)
     loaned_at = models.DateTimeField(auto_now_add=True)
     deliver_in = models.DateTimeField()
     delivery_at = models.DateTimeField(null=True)
