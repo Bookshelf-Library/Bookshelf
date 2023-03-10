@@ -4,6 +4,7 @@ from .views import (
     AccountDetailView,
     AccountStatusDetailView,
     AccountLoansDetailView,
+    AccountLoanView,
 )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
@@ -15,4 +16,5 @@ urlpatterns = [
     path("users/<str:account_id>/", AccountDetailView.as_view()),
     path("users/<str:account_id>/status/", AccountStatusDetailView.as_view()),
     path("users/<str:account_id>/loans/", AccountLoansDetailView.as_view()),
+    path("users/<str:account_id>/books/<str:book_id>/", AccountLoanView.as_view()),
 ]
