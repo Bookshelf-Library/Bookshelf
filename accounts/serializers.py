@@ -53,6 +53,8 @@ class AccountSerializer(serializers.ModelSerializer):
             "is_colaborator": {"allow_null": True, "default": False},
         }
 
+        depth = 0
+
     def validate(self, attrs: dict):
         is_colab = attrs.get("is_colaborator", None)
 
