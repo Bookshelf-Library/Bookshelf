@@ -1,7 +1,17 @@
 import pytz
 
 
-def permission_to_loan(account_id, Loan, current_date):
+def permission_to_loan(account_id, Loan=None, current_date=None):
+    if Loan is None:
+        from copies.models import Loan
+
+        Loan = Loan
+
+    if current_date is None:
+        from datetime import datetime
+
+        current_date = datetime.now()
+
     loans = Loan.objects.filter(account_id=account_id, is_active=True)
 
     utc = pytz.UTC
