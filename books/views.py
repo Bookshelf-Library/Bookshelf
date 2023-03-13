@@ -7,6 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from .permissions import BookPermission
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.types import OpenApiTypes
 import ipdb
 
 
@@ -23,6 +25,17 @@ class FollowBook(generics.CreateAPIView):
     queryset = Follow.objects.all()
     serializer_class = FollowSerializer
 
+    @extend_schema(
+        operation_id="follow_create",
+        request=FollowSerializer,
+        responses={201: FollowSerializer},
+        description="Rota para seguir um livro",
+        summary="Seguir um livro",
+        tags=["Follow"],
+    )
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -32,14 +45,8 @@ class FollowBook(generics.CreateAPIView):
             return Response(
                 {"message": "user is already following this book"}, status=400
             )
-            return Response(
-                {"message": "user is already following this book"}, status=400
-            )
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        return Response(
-            serializer.data, status=status.HTTP_201_CREATED, headers=headers
-        )
         return Response(
             serializer.data, status=status.HTTP_201_CREATED, headers=headers
         )
@@ -50,20 +57,49 @@ class FollowBook(generics.CreateAPIView):
         serializer.save(account=self.request.user, book=book)
 
 
-class FollowDetailView(generics.RetrieveUpdateDestroyAPIView):
+class FollowDetailView(generics.DestroyAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-    serializer_class = BookSerializer
-    queryset = Book.objects.all()
+    serializer_class = FollowSerializer
+    queryset = Follow.objects.all()
     lookup_url_kwarg = "book_id"
 
-    def destroy(self, request, *args, **kwargs):
-        find_book = get_object_or_404(Book, pk=kwargs["book_id"])
-        follow = Follow.objects.filter(book=find_book, account=request.user).first()
-        if follow:
-            self.perform_destroy(follow)
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(
-            {"message": "User is not following this book"},
-            status=status.HTTP_404_NOT_FOUND,
-        )
+    @extend_schema(
+        operation_id="follow_create",
+        request=FollowSerializer,
+        responses={201: FollowSerializer},
+        description="Rota para deixar de seguir um livro",
+        summary="Parar de seguir o livro",
+        tags=["Follow"],
+    )
+    def delete(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+
+class ListCreateBooks(generics.ListCreateAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [BookPermission]
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+
+    @extend_schema(
+        operation_id="books_list",
+        request=BookSerializer,
+        responses={201: BookSerializer},
+        description="Rota para criação de livros",
+        summary="Listagem de livros",
+        tags=["Books"],
+    )
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    @extend_schema(
+        operation_id="books_post",
+        request=BookSerializer,
+        responses={201: BookSerializer},
+        description="Rota para criação de livros",
+        summary="Criação de livros",
+        tags=["Books"],
+    )
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
