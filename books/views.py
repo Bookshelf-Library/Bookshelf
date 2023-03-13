@@ -1,5 +1,6 @@
 from rest_framework import generics, status
 from .models import Book, Follow
+from accounts.serializers import AccountSerializer
 from .serializers import BookSerializer, FollowSerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -8,6 +9,14 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
+import ipdb
+
+
+class ListCreateBooks(generics.ListCreateAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [BookPermission]
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
 
 
 class FollowBook(generics.CreateAPIView):
@@ -30,7 +39,8 @@ class FollowBook(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        find_account = Book.objects.filter(account=request.user)
+
+        find_account = Book.objects.filter(id=kwargs["book_id"], followers=request.user)
         if find_account:
             return Response(
                 {"message": "user is already following this book"}, status=400
