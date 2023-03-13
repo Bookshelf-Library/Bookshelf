@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404
 from .serializers import AccountSerializer
 from .models import Account
 from .permissions import CreateUserOrIsColaborator, IsOwnerOrColaborator
+from drf_spectacular.utils import extend_schema
 
 
 class AccountView(ListCreateAPIView):
@@ -18,6 +19,28 @@ class AccountView(ListCreateAPIView):
 
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
+
+    @extend_schema(
+        operation_id="follow_create",
+        request=AccountSerializer,
+        responses={201: AccountSerializer},
+        description="Rota para listar os usuários",
+        summary="Listar usuários",
+        tags=["Accounts"],
+    )
+    def get(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+    @extend_schema(
+        operation_id="follow_create",
+        request=AccountSerializer,
+        responses={201: AccountSerializer},
+        description="Rota para criar um usuário",
+        summary="Criar usuário",
+        tags=["Accounts"],
+    )
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
 
 
 class AccountDetailView(RetrieveUpdateDestroyAPIView):
@@ -29,12 +52,54 @@ class AccountDetailView(RetrieveUpdateDestroyAPIView):
 
     lookup_url_kwarg = "account_id"
 
+    @extend_schema(
+        operation_id="follow_create",
+        request=AccountSerializer,
+        responses={201: AccountSerializer},
+        description="Rota para listar um usuário com base no UUID",
+        summary="Listar usuário específico",
+        tags=["Accounts"],
+    )
+    def get(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
 
-class AccountStatusDetailView(ListAPIView):
+    @extend_schema(
+        operation_id="follow_create",
+        request=AccountSerializer,
+        responses={201: AccountSerializer},
+        description="Rota para atualizar os usuários",
+        summary="Atualização de usuários",
+        tags=["Accounts"],
+    )
+    def put(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+    @extend_schema(
+        operation_id="follow_create",
+        request=AccountSerializer,
+        responses={201: AccountSerializer},
+        description="Rota para atualizar um usuário com base no UUID",
+        summary="Atualizar um usuário específico",
+        tags=["Accounts"],
+    )
+    def patch(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+    @extend_schema(
+        operation_id="follow_create",
+        request=AccountSerializer,
+        responses={201: AccountSerializer},
+        description="Rota para deleção de usuário com base no UUID",
+        summary="Deleção de usuário",
+        tags=["Accounts"],
+    )
+    def delete(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+
+class AccountStatusDetailView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, IsOwnerOrColaborator]
-
-    lookup_url_kwarg = ("account_id", "book_id")
 
     def get(self, request, account_id):
         find_account = get_object_or_404(Account, pk=account_id)

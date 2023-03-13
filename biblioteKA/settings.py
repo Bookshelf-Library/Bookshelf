@@ -46,7 +46,12 @@ DJANGO_APPS = [
 
 THIRD_PART_APPS = ["rest_framework"]
 
-PROJECT_APPS = ["accounts", "books", "copies", 'drf_spectacular',]
+PROJECT_APPS = [
+    "accounts",
+    "books",
+    "copies",
+    "drf_spectacular",
+]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PART_APPS + PROJECT_APPS
 
@@ -146,12 +151,14 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Bookshelf',
-    'DESCRIPTION': 'A Bookshelf é uma aplicação que veio para simplificar os empréstimos de livros, basta entrar em contato com seu colaborador para que o empréstimo seja feito!',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
+    "TITLE": "Bookshelf",
+    "DESCRIPTION":
+    """A Bookshelf é uma aplicação que veio para simplificar os empréstimos de livros, basta entrar em contato com seu colaborador para que o empréstimo seja feito! <br/><br/>
+    Com processos <b>simples</b>, você estudante pode consultar seus prazos de entrega, visualizar os livros disponíveis, e o melhor de tudo, ao demosntrar interesse seguindo um livro, <strong>receberá um email assim que uma cópia dele estiver disponível!</strong>""",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
 }
