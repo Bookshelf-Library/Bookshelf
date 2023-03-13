@@ -18,8 +18,6 @@ from drf_spectacular.utils import extend_schema
 
 from .utils import permission_to_loan
 
-import ipdb
-
 from datetime import timedelta, datetime
 
 
