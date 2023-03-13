@@ -26,13 +26,20 @@ class FollowBook(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        find_account = Book.objects.filter(followers=request.user.id)
+
+        find_account = Book.objects.filter(id=kwargs["book_id"], followers=request.user)
         if find_account:
+            return Response(
+                {"message": "user is already following this book"}, status=400
+            )
             return Response(
                 {"message": "user is already following this book"}, status=400
             )
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
         return Response(
             serializer.data, status=status.HTTP_201_CREATED, headers=headers
         )

@@ -1,5 +1,4 @@
 from rest_framework import generics
-import ipdb
 from rest_framework.views import Response
 from books.permissions import BookPermission
 from django.shortcuts import get_object_or_404

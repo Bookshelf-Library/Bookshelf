@@ -13,7 +13,7 @@ class BookSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "followers", "copies"]
 
     def get_copies(self, obj):
-        return Copy.objects.filter(book=obj).count()
+        return Copy.objects.filter(book=obj, is_avaliable=True).count()
 
 
 class FollowSerializer(serializers.ModelSerializer):

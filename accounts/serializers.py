@@ -16,7 +16,7 @@ class AccountSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "following",
-            "loans",
+            "copies",
             "is_colaborator",
             "is_superuser",
         ]
@@ -25,7 +25,7 @@ class AccountSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "following",
-            "loans",
+            "copies",
             "is_superuser",
         ]
         extra_kwargs = {
@@ -52,6 +52,8 @@ class AccountSerializer(serializers.ModelSerializer):
             "last_name": {"required": True},
             "is_colaborator": {"allow_null": True, "default": False},
         }
+
+        depth = 0
 
     def validate(self, attrs: dict):
         is_colab = attrs.get("is_colaborator", None)

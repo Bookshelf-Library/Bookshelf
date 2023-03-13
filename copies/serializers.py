@@ -7,7 +7,9 @@ class CopySerializer(serializers.ModelSerializer):
         model = Copy
         fields = ["id", "is_avaliable", "book", "loans", "last_loan"]
         read_only_fields = ["id", "book", "is_avaliable", "loans", "last_loan"]
-        extra_kwargs = {"last_loan": {"allow_null": True}}
+        extra_kwargs = {
+            "last_loan": {"allow_null": True},
+        }
 
 
 class LoanSerializer(serializers.ModelSerializer):
@@ -18,7 +20,7 @@ class LoanSerializer(serializers.ModelSerializer):
             "is_active",
             "loaned_at",
             "deliver_in",
-            "deliver_at",
+            "delivery_at",
             "copy",
             "account",
         ]
@@ -27,7 +29,8 @@ class LoanSerializer(serializers.ModelSerializer):
             "copy",
             "loaned_at",
             "deliver_in",
-            "deliver_at",
+            "delivery_at",
             "account",
             "is_active",
         ]
+        extra_kwags = {"is_active": {"default": True}}
