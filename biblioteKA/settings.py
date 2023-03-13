@@ -14,14 +14,6 @@ from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
 import os
-#import environ
-
-#env = environ.Env(
-#    DEBUG=(bool, False)
-#)
-
-#environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-
 
 
 load_dotenv()
@@ -130,14 +122,14 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-#EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-#EMAIL_USE_TLS = True
-#EMAIL_HOST = env("EMAIL_HOST")
-#EMAIL_PORT = env("EMAIL_PORT")
-#EMAIL_HOST_USER = env("EMAIL_HOST_USER")  # email do remetente
-#EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")  # senha do email do remetente
-
 AUTH_USER_MODEL = "accounts.Account"
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_USE_TLS = True
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
