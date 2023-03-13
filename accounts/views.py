@@ -14,6 +14,9 @@ from copies.serializers import LoanSerializer
 from .models import Account
 from copies.models import Copy, Loan
 from .permissions import CreateUserOrIsColaborator, IsOwnerOrColaborator
+
+from .utils import permission_to_loan
+
 import ipdb
 
 from datetime import timedelta, datetime
@@ -63,17 +66,30 @@ class AccountLoanView(CreateAPIView):
     def create(self, request, *args, **kwargs):
         account_id = kwargs["account_id"]
         book_id = kwargs["book_id"]
+        current_date = datetime.now()
+
+        allowed_to_loan = permission_to_loan(
+            account_id=account_id, Loan=Loan, current_date=current_date
+        )
+
+        if not allowed_to_loan:
+            return Response(
+                {"message": "Not allowed to loan. Check loans from this account."},
+                status=status.HTTP_406_NOT_ACCEPTABLE,
+            )
 
         avaliable_copies = Copy.objects.filter(
             book_id=book_id, is_avaliable=True
         ).first()
 
         if avaliable_copies is None:
-            return Response({"message": "No copy avaliable"})
+            return Response(
+                {"message": "No copy avaliable"}, status=status.HTTP_404_NOT_FOUND
+            )
 
         avaliable_copies.is_avaliable = False
 
-        deliver = datetime.now() + timedelta(days=7)
+        deliver = current_date + timedelta(days=7)
 
         loan = Loan(
             account_id=account_id,
@@ -81,12 +97,12 @@ class AccountLoanView(CreateAPIView):
             deliver_in=deliver,
         )
 
-        avaliable_copies.last_loan = datetime.now()
+        avaliable_copies.last_loan = current_date
         avaliable_copies.save()
         loan.save()
 
         serializer = LoanSerializer(loan)
-        return Response(serializer.data, 201)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class AccountDeliveryView(UpdateAPIView):
@@ -96,7 +112,7 @@ class AccountDeliveryView(UpdateAPIView):
     def update(self, request, *args, **kwargs):
         copy_id = self.kwargs["copy_id"]
 
-        user_loan = Loan.objects.filter(account=request.user, copy_id=copy_id).first()
+        user_loan = Loan.objects.filter(account=request.user, copy_id=copy_id, delivery_at=None).first()
 
         if user_loan is None:
             return Response(
