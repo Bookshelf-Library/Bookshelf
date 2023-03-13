@@ -30,9 +30,11 @@ class AccountDetailView(RetrieveUpdateDestroyAPIView):
     lookup_url_kwarg = "account_id"
 
 
-class AccountStatusDetailView(APIView):
+class AccountStatusDetailView(ListAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, IsOwnerOrColaborator]
+
+    lookup_url_kwarg = ("account_id", "book_id")
 
     def get(self, request, account_id):
         find_account = get_object_or_404(Account, pk=account_id)
