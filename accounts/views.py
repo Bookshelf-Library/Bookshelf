@@ -89,7 +89,7 @@ class AccountLoanView(CreateAPIView):
 
         avaliable_copies.is_avaliable = False
 
-        deliver = current_date + timedelta(days=7)
+        deliver = current_date + timedelta(seconds=7)
 
         loan = Loan(
             account_id=account_id,
@@ -112,7 +112,9 @@ class AccountDeliveryView(UpdateAPIView):
     def update(self, request, *args, **kwargs):
         copy_id = self.kwargs["copy_id"]
 
-        user_loan = Loan.objects.filter(account=request.user, copy_id=copy_id, delivery_at=None).first()
+        user_loan = Loan.objects.filter(
+            account=request.user, copy_id=copy_id, delivery_at=None
+        ).first()
 
         if user_loan is None:
             return Response(
@@ -145,7 +147,7 @@ class AccountDeliveryView(UpdateAPIView):
             message=f'Olá !\n\nSua cópia do livro "{user_loan.copy.book.title}" está disponível para retirada.\n\nObrigado por utilizar nossa biblioteca!',
             from_email=settings.EMAIL_HOST_USER,
             recipient_list=emails,
-            fail_silently=False,
+            fail_silently=True,
         )
 
         return Response(serializer.data, status=status.HTTP_200_OK)
