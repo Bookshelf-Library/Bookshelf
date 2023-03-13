@@ -10,7 +10,7 @@ class Copy(models.Model):
     )
 
     loans = models.ManyToManyField(
-        "accounts.Account", through="copies.Loan", related_name="loans"
+        "accounts.Account", through="copies.Loan", related_name="copies"
     )
 
     last_loan = models.DateTimeField(null=True, default=None)
