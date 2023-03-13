@@ -16,7 +16,7 @@ class AccountSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "following",
-            "loans",
+            "copies",
             "is_colaborator",
             "is_superuser",
         ]
@@ -25,7 +25,7 @@ class AccountSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "following",
-            "loans",
+            "copies",
             "is_superuser",
         ]
         extra_kwargs = {
