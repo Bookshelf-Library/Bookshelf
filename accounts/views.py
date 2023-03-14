@@ -16,7 +16,7 @@ from copies.models import Copy, Loan
 from .permissions import CreateUserOrIsColaborator, IsOwnerOrColaborator
 from drf_spectacular.utils import extend_schema
 
-from .utils import permission_to_loan
+from .utils import permission_to_loan, openingtime
 
 from datetime import timedelta, datetime
 
@@ -35,13 +35,13 @@ class AccountView(ListCreateAPIView):
     @extend_schema(
         operation_id="follow_create",
         request=AccountSerializer,
-        responses={201: AccountSerializer},
+        responses={200: AccountSerializer},
         description="Rota para listar os usuários",
         summary="Listar usuários",
         tags=["Accounts"],
     )
     def get(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+        return self.list(request, *args, **kwargs)
 
     @extend_schema(
         operation_id="follow_create",
@@ -67,46 +67,46 @@ class AccountDetailView(RetrieveUpdateDestroyAPIView):
     @extend_schema(
         operation_id="follow_create",
         request=AccountSerializer,
-        responses={201: AccountSerializer},
+        responses={200: AccountSerializer},
         description="Rota para listar um usuário com base no UUID",
         summary="Listar usuário específico",
         tags=["Accounts"],
     )
     def get(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+        return self.retrieve(request, *args, **kwargs)
 
     @extend_schema(
         operation_id="follow_create",
         request=AccountSerializer,
-        responses={201: AccountSerializer},
+        responses={200: AccountSerializer},
         description="Rota para atualizar os usuários",
         summary="Atualização de usuários",
         tags=["Accounts"],
     )
     def put(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+        return self.update(request, *args, **kwargs)
 
     @extend_schema(
         operation_id="follow_create",
         request=AccountSerializer,
-        responses={201: AccountSerializer},
+        responses={200: AccountSerializer},
         description="Rota para atualizar um usuário com base no UUID",
         summary="Atualizar um usuário específico",
         tags=["Accounts"],
     )
     def patch(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+        return self.partial_update(request, *args, **kwargs)
 
     @extend_schema(
         operation_id="follow_create",
         request=AccountSerializer,
-        responses={201: AccountSerializer},
+        responses={204: AccountSerializer},
         description="Rota para deleção de usuário com base no UUID",
         summary="Deleção de usuário",
         tags=["Accounts"],
     )
     def delete(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+        return self.destroy(request, *args, **kwargs)
 
 
 class AccountStatusDetailView(APIView):
@@ -132,6 +132,12 @@ class AccountLoanView(CreateAPIView):
         account_id = kwargs["account_id"]
         book_id = kwargs["book_id"]
         current_date = datetime.now()
+        current_day = current_date.strftime("%A")
+        current_time = current_date.strftime("%H")
+        is_working = openingtime(current_day, current_time)
+
+        if not is_working:
+            return Response({"message": "The library is currently not open. Opening hours: 9am - 6pm Monday to Friday"}, status.HTTP_401_UNAUTHORIZED)
 
         allowed_to_loan = permission_to_loan(
             account_id=account_id, Loan=Loan, current_date=current_date
@@ -154,7 +160,7 @@ class AccountLoanView(CreateAPIView):
 
         avaliable_copies.is_avaliable = False
 
-        deliver = current_date + timedelta(seconds=7)
+        deliver = current_date + timedelta(days=7)
 
         loan = Loan(
             account_id=account_id,

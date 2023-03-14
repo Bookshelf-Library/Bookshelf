@@ -8,8 +8,6 @@ from .models import Copy
 from .serializers import CopySerializer
 from drf_spectacular.utils import extend_schema
 
-# Programador é quem programa
-
 
 class CopiesDetailView(generics.CreateAPIView):
     authentication_classes = [JWTAuthentication]
