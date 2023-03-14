@@ -67,13 +67,24 @@ class FollowDetailView(generics.DestroyAPIView):
     @extend_schema(
         operation_id="follow_create",
         request=FollowSerializer,
-        responses={201: FollowSerializer},
+        responses={204: FollowSerializer},
         description="Rota para deixar de seguir um livro",
         summary="Parar de seguir o livro",
         tags=["Follow"],
     )
     def delete(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+        return self.destroy(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        find_book = get_object_or_404(Book, pk=kwargs["book_id"])
+        follow = Follow.objects.filter(book=find_book, account=request.user).first()
+        if follow:
+            self.perform_destroy(follow)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(
+            {"message": "User is not following this book"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
 
 
 class ListCreateBooks(generics.ListCreateAPIView):
@@ -85,7 +96,7 @@ class ListCreateBooks(generics.ListCreateAPIView):
     @extend_schema(
         operation_id="books_list",
         request=BookSerializer,
-        responses={201: BookSerializer},
+        responses={200: BookSerializer},
         description="Rota para criação de livros",
         summary="Listagem de livros",
         tags=["Books"],
