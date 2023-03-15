@@ -1,0 +1,603 @@
+openapi: 3.0.3
+info:
+  title: Bookshelf
+  version: 1.0.0
+  description: "A Bookshelf é uma aplicação que veio para simplificar os empréstimos\
+    \ de livros, basta entrar em contato com seu colaborador para que o empréstimo\
+    \ seja feito! \n Com processos simples, você estudante pode consultar seus prazos\
+    \ de entrega, visualizar os livros disponíveis, e o melhor de tudo, ao demosntrar\
+    \ interesse seguindo um livro, <strong>receberá um email assim que uma cópia dele\
+    \ estiver disponível!"
+paths:
+  /api/books/:
+    get:
+      operationId: books_list
+      description: Rota para criação de livros
+      summary: Listagem de livros
+      tags:
+      - Books
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+          description: ''
+    post:
+      operationId: books_post
+      description: Rota para criação de livros
+      summary: Criação de livros
+      tags:
+      - Books
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Book'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Book'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+          description: ''
+  /api/books/{book_id}/copies/{copies_qtd}/:
+    post:
+      operationId: copies_post
+      description: Rota para criação de copias
+      summary: Rota para criação de copias
+      parameters:
+      - in: path
+        name: book_id
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: copies_qtd
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Copias
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Copy'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Copy'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Copy'
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Copy'
+          description: ''
+  /api/login/:
+    post:
+      operationId: follow_create
+      description: Rota para autenticação de usuário
+      summary: Autenticação de usuário
+      tags:
+      - Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Account'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Account'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+          description: ''
+  /api/refresh/:
+    post:
+      operationId: follow_create_2
+      description: Rota para refresh do token do usuário
+      summary: Refresh de token do usuário
+      tags:
+      - Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Account'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Account'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+          description: ''
+  /api/users/:
+    get:
+      operationId: follow_create_3
+      description: Rota para listar os usuários
+      summary: Listar usuários
+      tags:
+      - Accounts
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
+          description: ''
+    post:
+      operationId: follow_create_4
+      description: Rota para criar um usuário
+      summary: Criar usuário
+      tags:
+      - Accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Account'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Account'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+          description: ''
+  /api/users/{account_id}/:
+    get:
+      operationId: follow_create_8
+      description: Rota para listar um usuário com base no UUID
+      summary: Listar usuário específico
+      parameters:
+      - in: path
+        name: account_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - Accounts
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+          description: ''
+    put:
+      operationId: follow_create_10
+      description: Rota para atualizar os usuários
+      summary: Atualização de usuários
+      parameters:
+      - in: path
+        name: account_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - Accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Account'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Account'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+          description: ''
+    patch:
+      operationId: follow_create_9
+      description: Rota para atualizar um usuário com base no UUID
+      summary: Atualizar um usuário específico
+      parameters:
+      - in: path
+        name: account_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - Accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAccount'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAccount'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAccount'
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+          description: ''
+    delete:
+      operationId: follow_create_7
+      description: Rota para deleção de usuário com base no UUID
+      summary: Deleção de usuário
+      parameters:
+      - in: path
+        name: account_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - Accounts
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+          description: ''
+  /api/users/{account_id}/loans/:
+    get:
+      operationId: api_users_loans_retrieve
+      parameters:
+      - in: path
+        name: account_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+          description: ''
+  /api/users/{account_id}/status/:
+    get:
+      operationId: api_users_status_retrieve
+      parameters:
+      - in: path
+        name: account_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/users/follow/{book_id}/:
+    post:
+      operationId: follow_create_5
+      description: Rota para seguir um livro
+      summary: Seguir um livro
+      parameters:
+      - in: path
+        name: book_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - Follow
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Follow'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Follow'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Follow'
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Follow'
+          description: ''
+  /api/users/unfollow/{book_id}/:
+    delete:
+      operationId: follow_create_6
+      description: Rota para deixar de seguir um livro
+      summary: Parar de seguir o livro
+      parameters:
+      - in: path
+        name: book_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - Follow
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Follow'
+          description: ''
+components:
+  schemas:
+    Account:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+          maxLength: 128
+        username:
+          type: string
+          writeOnly: true
+          nullable: true
+          maxLength: 150
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        following:
+          type: array
+          items:
+            type: string
+            format: uuid
+          readOnly: true
+        loans:
+          type: array
+          items:
+            type: string
+            format: uuid
+          readOnly: true
+        is_colaborator:
+          type: boolean
+          nullable: true
+          default: false
+        is_superuser:
+          type: boolean
+          readOnly: true
+          title: Superuser status
+          description: Designates that this user has all permissions without explicitly
+            assigning them.
+      required:
+      - created_at
+      - email
+      - first_name
+      - following
+      - id
+      - is_superuser
+      - last_name
+      - loans
+      - password
+      - updated_at
+      - username
+    Book:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        title:
+          type: string
+          maxLength: 120
+        pages:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        author:
+          type: string
+          maxLength: 120
+        publisher:
+          type: string
+          maxLength: 120
+        followers:
+          type: array
+          items:
+            type: string
+            format: uuid
+          readOnly: true
+        copies:
+          type: string
+          readOnly: true
+      required:
+      - author
+      - copies
+      - followers
+      - id
+      - pages
+      - publisher
+      - title
+    Copy:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        is_avaliable:
+          type: boolean
+          readOnly: true
+        book:
+          type: string
+          format: uuid
+          readOnly: true
+        loans:
+          type: array
+          items:
+            type: string
+            format: uuid
+          readOnly: true
+        last_loan:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - book
+      - id
+      - is_avaliable
+      - last_loan
+      - loans
+    Follow:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        book:
+          type: string
+          format: uuid
+          readOnly: true
+      required:
+      - book
+      - id
+    PatchedAccount:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+          maxLength: 128
+        username:
+          type: string
+          writeOnly: true
+          nullable: true
+          maxLength: 150
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        following:
+          type: array
+          items:
+            type: string
+            format: uuid
+          readOnly: true
+        loans:
+          type: array
+          items:
+            type: string
+            format: uuid
+          readOnly: true
+        is_colaborator:
+          type: boolean
+          nullable: true
+          default: false
+        is_superuser:
+          type: boolean
+          readOnly: true
+          title: Superuser status
+          description: Designates that this user has all permissions without explicitly
+            assigning them.
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
