@@ -1,3 +1,4 @@
+# Rest_Framework
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.views import APIView, Response, Request, status
@@ -8,21 +9,34 @@ from rest_framework.generics import (
     CreateAPIView,
     UpdateAPIView,
 )
-from django.shortcuts import get_object_or_404
-from .serializers import AccountSerializer
-from copies.serializers import LoanSerializer
+
+# Models
 from .models import Account
 from copies.models import Copy, Loan
+
+# Serializers
+from .serializers import AccountSerializer
+from copies.serializers import LoanSerializer
+
+# Custom Permissions
 from .permissions import CreateUserOrIsColaborator, IsOwnerOrColaborator
-from drf_spectacular.utils import extend_schema
 
-from .utils import permission_to_loan, openingtime
+# Utility Functions
+from .utils import permission_to_loan, openingtime, remove_punishment
 
-from datetime import timedelta, datetime
-
-
+# Django
+from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
 from django.conf import settings
+
+# DRF Spectacular
+from drf_spectacular.utils import extend_schema
+
+# Datetime
+from datetime import timedelta, datetime
+
+# APScheculer
+from apscheduler.schedulers.background import BackgroundScheduler
 
 
 class AccountView(ListCreateAPIView):
@@ -137,7 +151,12 @@ class AccountLoanView(CreateAPIView):
         is_working = openingtime(current_day, current_time)
 
         if not is_working:
-            return Response({"message": "The library is currently not open. Opening hours: 9am - 6pm Monday to Friday"}, status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {
+                    "message": "The library is currently not open. Opening hours: 9am - 6pm Monday to Friday"
+                },
+                status.HTTP_401_UNAUTHORIZED,
+            )
 
         allowed_to_loan = permission_to_loan(
             account_id=account_id, Loan=Loan, current_date=current_date
@@ -160,7 +179,7 @@ class AccountLoanView(CreateAPIView):
 
         avaliable_copies.is_avaliable = False
 
-        deliver = current_date + timedelta(days=7)
+        deliver = current_date + timedelta(seconds=7)
 
         loan = Loan(
             account_id=account_id,
@@ -197,29 +216,43 @@ class AccountDeliveryView(UpdateAPIView):
                 {"message": "Copy already returned"}, status=status.HTTP_409_CONFLICT
             )
 
-        today_date = datetime.now()
+        current_date = datetime.now()
 
-        user_loan.delivery_at = today_date
+        account: Account = request.user
+        allowed_to_loan = permission_to_loan(
+            account_id=account.id, Loan=Loan, current_date=current_date
+        )
+
+        if not allowed_to_loan and not account.punishment:
+            account.punishment = datetime.now() + timedelta(days=2)
+            account.save()
+
+            scheduler = BackgroundScheduler()
+            scheduler.add_job(remove_punishment, "interval", days=2, args=[account])
+            scheduler.start()
+
+        user_loan.delivery_at = current_date
         user_loan.is_active = False
         user_loan.save()
+
+        serializer = LoanSerializer(user_loan)
 
         copy = Copy.objects.get(pk=copy_id)
         copy.is_avaliable = True
         copy.save()
 
-        serializer = LoanSerializer(user_loan)
-
         followers = user_loan.copy.book.followers
 
         emails = [account.email for account in followers.all()]
 
-        send_mail(
-            subject="Sua cópia está disponível!",
-            message=f'Olá !\n\nSua cópia do livro "{user_loan.copy.book.title}" está disponível para retirada.\n\nObrigado por utilizar nossa biblioteca!',
-            from_email=settings.EMAIL_HOST_USER,
-            recipient_list=emails,
-            fail_silently=True,
-        )
+        if emails:
+            send_mail(
+                subject="Sua cópia está disponível!",
+                message=f'Olá !\n\nSua cópia do livro "{user_loan.copy.book.title}" está disponível para retirada.\n\nObrigado por utilizar nossa biblioteca!',
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=emails,
+                fail_silently=True,
+            )
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
