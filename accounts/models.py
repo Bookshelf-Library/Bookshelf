@@ -12,6 +12,7 @@ class Account(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_colaborator = models.BooleanField(default=False)
+    punishment = models.DateTimeField(null=True, default=None)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
