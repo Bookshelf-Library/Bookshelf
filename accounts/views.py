@@ -1,3 +1,4 @@
+# Rest_Framework
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.views import APIView, Response, Request, status
@@ -8,21 +9,34 @@ from rest_framework.generics import (
     CreateAPIView,
     UpdateAPIView,
 )
-from django.shortcuts import get_object_or_404
-from .serializers import AccountSerializer
-from copies.serializers import LoanSerializer
+
+# Models
 from .models import Account
 from copies.models import Copy, Loan
+
+# Serializers
+from .serializers import AccountSerializer
+from copies.serializers import LoanSerializer
+
+# Custom Permissions
 from .permissions import CreateUserOrIsColaborator, IsOwnerOrColaborator
-from drf_spectacular.utils import extend_schema
 
-from .utils import permission_to_loan
+# Utility Functions
+from .utils import permission_to_loan, openingtime, remove_punishment
 
-from datetime import timedelta, datetime
-
-
+# Django
+from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
 from django.conf import settings
+
+# DRF Spectacular
+from drf_spectacular.utils import extend_schema
+
+# Datetime
+from datetime import timedelta, datetime
+
+# APScheculer
+from apscheduler.schedulers.background import BackgroundScheduler
 
 
 class AccountView(ListCreateAPIView):
@@ -35,13 +49,13 @@ class AccountView(ListCreateAPIView):
     @extend_schema(
         operation_id="follow_create",
         request=AccountSerializer,
-        responses={201: AccountSerializer},
+        responses={200: AccountSerializer},
         description="Rota para listar os usuários",
         summary="Listar usuários",
         tags=["Accounts"],
     )
     def get(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+        return self.list(request, *args, **kwargs)
 
     @extend_schema(
         operation_id="follow_create",
@@ -67,46 +81,46 @@ class AccountDetailView(RetrieveUpdateDestroyAPIView):
     @extend_schema(
         operation_id="follow_create",
         request=AccountSerializer,
-        responses={201: AccountSerializer},
+        responses={200: AccountSerializer},
         description="Rota para listar um usuário com base no UUID",
         summary="Listar usuário específico",
         tags=["Accounts"],
     )
     def get(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+        return self.retrieve(request, *args, **kwargs)
 
     @extend_schema(
         operation_id="follow_create",
         request=AccountSerializer,
-        responses={201: AccountSerializer},
+        responses={200: AccountSerializer},
         description="Rota para atualizar os usuários",
         summary="Atualização de usuários",
         tags=["Accounts"],
     )
     def put(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+        return self.update(request, *args, **kwargs)
 
     @extend_schema(
         operation_id="follow_create",
         request=AccountSerializer,
-        responses={201: AccountSerializer},
+        responses={200: AccountSerializer},
         description="Rota para atualizar um usuário com base no UUID",
         summary="Atualizar um usuário específico",
         tags=["Accounts"],
     )
     def patch(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+        return self.partial_update(request, *args, **kwargs)
 
     @extend_schema(
         operation_id="follow_create",
         request=AccountSerializer,
-        responses={201: AccountSerializer},
+        responses={204: AccountSerializer},
         description="Rota para deleção de usuário com base no UUID",
         summary="Deleção de usuário",
         tags=["Accounts"],
     )
     def delete(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+        return self.destroy(request, *args, **kwargs)
 
 
 class AccountStatusDetailView(APIView):
@@ -132,6 +146,17 @@ class AccountLoanView(CreateAPIView):
         account_id = kwargs["account_id"]
         book_id = kwargs["book_id"]
         current_date = datetime.now()
+        current_day = current_date.strftime("%A")
+        current_time = current_date.strftime("%H")
+        is_working = openingtime(current_day, current_time)
+
+        if not is_working:
+            return Response(
+                {
+                    "message": "The library is currently not open. Opening hours: 9am - 6pm Monday to Friday"
+                },
+                status.HTTP_401_UNAUTHORIZED,
+            )
 
         allowed_to_loan = permission_to_loan(
             account_id=account_id, Loan=Loan, current_date=current_date
@@ -191,29 +216,43 @@ class AccountDeliveryView(UpdateAPIView):
                 {"message": "Copy already returned"}, status=status.HTTP_409_CONFLICT
             )
 
-        today_date = datetime.now()
+        current_date = datetime.now()
 
-        user_loan.delivery_at = today_date
+        account: Account = request.user
+        allowed_to_loan = permission_to_loan(
+            account_id=account.id, Loan=Loan, current_date=current_date
+        )
+
+        if not allowed_to_loan and not account.punishment:
+            account.punishment = datetime.now() + timedelta(days=2)
+            account.save()
+
+            scheduler = BackgroundScheduler()
+            scheduler.add_job(remove_punishment, "interval", days=2, args=[account])
+            scheduler.start()
+
+        user_loan.delivery_at = current_date
         user_loan.is_active = False
         user_loan.save()
+
+        serializer = LoanSerializer(user_loan)
 
         copy = Copy.objects.get(pk=copy_id)
         copy.is_avaliable = True
         copy.save()
 
-        serializer = LoanSerializer(user_loan)
-
         followers = user_loan.copy.book.followers
 
         emails = [account.email for account in followers.all()]
 
-        send_mail(
-            subject="Sua cópia está disponível!",
-            message=f'Olá !\n\nSua cópia do livro "{user_loan.copy.book.title}" está disponível para retirada.\n\nObrigado por utilizar nossa biblioteca!',
-            from_email=settings.EMAIL_HOST_USER,
-            recipient_list=emails,
-            fail_silently=True,
-        )
+        if emails:
+            send_mail(
+                subject="Sua cópia está disponível!",
+                message=f'Olá !\n\nSua cópia do livro "{user_loan.copy.book.title}" está disponível para retirada.\n\nObrigado por utilizar nossa biblioteca!',
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=emails,
+                fail_silently=True,
+            )
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 

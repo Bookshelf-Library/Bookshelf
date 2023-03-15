@@ -1,14 +1,9 @@
 from rest_framework import serializers
 from .models import Account
 from rest_framework.validators import UniqueValidator
-from .utils import permission_to_loan
 
 
 class AccountSerializer(serializers.ModelSerializer):
-    allowed_to_loan = serializers.SerializerMethodField()
-
-    def get_allowed_to_loan(self, obj):
-        return permission_to_loan(account_id=obj.id)
 
     class Meta:
         model = Account
@@ -25,7 +20,7 @@ class AccountSerializer(serializers.ModelSerializer):
             "copies",
             "is_colaborator",
             "is_superuser",
-            "allowed_to_loan",
+            "punishment",
         ]
         read_only_fields = [
             "id",
@@ -34,7 +29,7 @@ class AccountSerializer(serializers.ModelSerializer):
             "following",
             "copies",
             "is_superuser",
-            "allowed_to_loan",
+            "punishment",
         ]
         extra_kwargs = {
             "password": {"write_only": True},
